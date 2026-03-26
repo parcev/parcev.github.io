@@ -1,0 +1,19 @@
+<h1>Suskaičiuokite, kiek picerijoje yra skirtingų picų, ir įveskite šį skaičių čia.</h1>
+<p id="ArTeisingai"></p>
+<input id="input" type="number" autofocus placeholder="Įrašyk, kiek yra picų">
+<button onclick="patikrinti()">Patvirtinti</button>
+<script>
+  var ArTeisingai = document.getElementById("ArTeisingai")
+  var input = document.getElementById("input")
+  function patikrinti() {
+    const ats = input.value
+    if (ats === "27") {
+      ArTeisingai.textContent = "Teisingai! Išeik iš picerijos, pasuk į dešinę, paeik 5 metrus ir ieškok kioskelio susijusio su informacinėmis technologijomis"
+    }
+    else {
+      ArTeisingai.textContent = "Neteisingai! Bandyk dar kartą";
+      input.value = "";
+      input.focus()
+    }
+  }
+</script>

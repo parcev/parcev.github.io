@@ -91,7 +91,7 @@
       font-weight: bold;
       font-size: 1.3rem;
       color: #2d3436;
-      min-height: 1.5em;
+      min-height: auto;
       transition: all 0.5s ease;
     }
 
@@ -130,7 +130,7 @@
     function patikrinti() {
       const ats = input.value.trim();
       if (ats === "27") {
-        ArTeisingai.textContent = "Teisingai! Išeik iš picerijos, pasuk į dešinę ir ieškok kiosko susijusio su informacinėmis technologijomis. Nufotografuok jį.";
+        ArTeisingai.textContent = "Teisingai!";
         ArTeisingai.classList.add('success');
 
         // Spawn fun pizza confetti

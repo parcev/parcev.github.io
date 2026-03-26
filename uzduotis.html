@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Picerijos užduotis</title>
   <style>
-    /* General page styling */
+    /* Page background */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #fceabb, #f8b500);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
       margin: 0;
       padding: 0;
       display: flex;
@@ -17,57 +16,94 @@
       min-height: 100vh;
       flex-direction: column;
       text-align: center;
-      color: #333;
+      background: radial-gradient(circle at top, #ffeaa7, #fab1a0);
+      overflow: hidden;
+      position: relative;
     }
 
+    /* Animated pizza confetti */
+    .pizza {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: url('https://i.imgur.com/1yHnkJv.png') no-repeat center/contain;
+      pointer-events: none;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Main heading */
     h1 {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       padding: 20px 30px;
       border-radius: 15px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-      max-width: 600px;
-      margin-bottom: 30px;
-      font-size: 1.5rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      max-width: 650px;
+      font-size: 1.6rem;
+      margin-bottom: 25px;
+      line-height: 1.4;
     }
 
+    /* Input field */
     #input {
-      padding: 10px 15px;
+      padding: 12px 15px;
       font-size: 1rem;
-      border: 2px solid #f8b500;
-      border-radius: 8px;
-      outline: none;
+      border: 2px solid #ff7675;
+      border-radius: 10px;
       width: 200px;
       text-align: center;
+      outline: none;
       transition: 0.3s;
     }
 
     #input:focus {
-      border-color: #ff6f61;
-      box-shadow: 0 0 5px rgba(255, 111, 97, 0.5);
+      border-color: #fd79a8;
+      box-shadow: 0 0 10px rgba(253, 121, 168, 0.5);
     }
 
+    /* Button */
     button {
-      padding: 10px 20px;
+      padding: 12px 25px;
       font-size: 1rem;
-      background-color: #ff6f61;
-      color: white;
+      margin-left: 12px;
       border: none;
-      border-radius: 8px;
-      margin-left: 10px;
+      border-radius: 10px;
+      background: #fd79a8;
+      color: white;
       cursor: pointer;
-      transition: 0.3s;
+      transition: transform 0.2s, background 0.3s;
     }
 
     button:hover {
-      background-color: #ff3b2e;
-      transform: scale(1.05);
+      transform: scale(1.1);
+      background: #d63031;
     }
 
+    /* Feedback message */
     #ArTeisingai {
       margin-top: 20px;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+      color: #2d3436;
+      min-height: 1.5em;
+      transition: all 0.5s ease;
     }
+
+    /* Success animation */
+    .success {
+      color: #00b894;
+      animation: bounce 0.8s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
   </style>
 </head>
 <body>
@@ -80,12 +116,28 @@
     const ArTeisingai = document.getElementById("ArTeisingai");
     const input = document.getElementById("input");
 
+    function spawnPizza() {
+      const pizza = document.createElement('div');
+      pizza.className = 'pizza';
+      pizza.style.left = Math.random() * window.innerWidth + 'px';
+      pizza.style.animationDuration = 3 + Math.random() * 3 + 's';
+      document.body.appendChild(pizza);
+      setTimeout(() => pizza.remove(), 6000);
+    }
+
     function patikrinti() {
       const ats = input.value.trim();
       if (ats === "27") {
-        ArTeisingai.textContent = "Teisingai! Išeik iš picerijos, pasuk į dešinę, paeik 20 metrų ir ieškok kioskelio susijusio su informacinėmis technologijomis";
+        ArTeisingai.textContent = "Teisingai! Išeik iš picerijos, pasuk į dešinę, paeik 5 metrus ir ieškok kioskelio susijusio su informacinėmis technologijomis";
+        ArTeisingai.classList.add('success');
+
+        // Spawn fun pizza confetti
+        for (let i = 0; i < 20; i++) {
+          setTimeout(spawnPizza, i * 150);
+        }
       } else {
         ArTeisingai.textContent = "Neteisingai! Bandyk dar kartą";
+        ArTeisingai.classList.remove('success');
         input.value = "";
         input.focus();
       }

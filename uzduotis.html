@@ -123,7 +123,7 @@
       pizza.style.left = Math.random() * window.innerWidth + 'px';
       pizza.style.animationDuration = 1 + Math.random() * 1 + 's';
       document.body.appendChild(pizza);
-      setTimeout(() => pizza.remove(), 6000);
+      setTimeout(() => pizza.remove(), 2000);
     }
 
     function patikrinti() {
@@ -134,7 +134,7 @@
 
         // Spawn fun pizza confetti
         for (let i = 0; i < 10; i++) {
-          setTimeout(spawnPizza, i * 75);
+          setTimeout(spawnPizza, i * 105);
         }
       } else {
         ArTeisingai.textContent = "Neteisingai! Bandyk dar kartą";

@@ -136,6 +136,10 @@
         // Spawn fun pizza confetti
         for (let i = 0; i < 15; i++) {
           setTimeout(spawnPizza, i * 150);
+          
+        setTimeout(() => {
+      window.location.href = "paskutine";
+    }, 1500);
         }
       } else {
         ArTeisingai.textContent = "Neteisingai! Bandyk dar kartą";

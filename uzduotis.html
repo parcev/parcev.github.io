@@ -123,7 +123,7 @@
       pizza.style.left = Math.random() * window.innerWidth + 'px';
       pizza.style.animationDuration = 1 + Math.random() * 1 + 's';
       document.body.appendChild(pizza);
-      setTimeout(() => pizza.remove(), 2000);
+      setTimeout(() => pizza.remove(), 1200);
     }
 
     function patikrinti() {
@@ -133,7 +133,7 @@
         ArTeisingai.classList.add('success');
 
         // Spawn fun pizza confetti
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 15; i++) {
           setTimeout(spawnPizza, i * 150);
         }
       } else {

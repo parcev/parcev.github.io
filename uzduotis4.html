@@ -95,6 +95,7 @@
 </div>
 
 <script>
+  input = document.getElementById("companyName")
     function checkAnswer() {
         const answer = document.getElementById('companyName').value.trim();
         if (answer.toLowerCase() === "hello") {
@@ -106,6 +107,12 @@
             alert("Neteisinga! Patikrinkite pavadinimą ir bandykite dar kartą.");
         }
     }
+  
+  input.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      checkAnswer();
+    }
+  });
 </script>
 
 </body>

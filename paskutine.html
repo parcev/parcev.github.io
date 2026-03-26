@@ -16,12 +16,11 @@
     transform: translateY(-30%);
   }
 
-  div {
+  /* Container styling like h1 */
+  .container {
     max-width: 800px;
     padding: 30px;
     text-align: center;
-    font-size: 2rem;
-    color: #1a1a1a;
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -29,16 +28,30 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
-  h1:hover {
+  .container:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Optional: adjust h1 and h2 inside container */
+  .container h1 {
+    font-size: 2rem;
+    color: #1a1a1a;
+    margin: 0 0 20px 0;
+  }
+
+  .container h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
   }
 </style>
 </head>
 <body>
-<div>
-<h1>Išeik iš picerijos, pasuk į dešinę ir ieškok kiosko susijusio su informacinėmis technologijomis. Nufotografuok jį.</h1>
-<h2>Sveikiname! Įveikėte žaidimą – galite grįžti ten, kur pradėjote</h2>
+
+<div class="container">
+  <h1>Išeik iš picerijos, pasuk į dešinę ir ieškok kiosko susijusio su informacinėmis technologijomis. Nufotografuok jį.</h1>
+  <h2>Sveikiname! Įveikėte žaidimą – galite grįžti ten, kur pradėjote</h2>
 </div>
 
 </body>

@@ -1,11 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="lt">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eikite į piceriją</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }.container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  text-align: center;
+  max-width: 500px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #666;
+}
+
+.btn {
+  display: inline-block;
+  background: #ff5722;
+  padding: 15px 25px;
+  font-size: 16px;
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: #e64a19;
+  transform: scale(1.05);
+}
+
+  </style>
 </head>
 <body>
-  <h1>Užeikite į piceriją, kuri yra arčiau pirmosios vietos (akmens). </h1>
-  <h2>Atėjęs į piveriją, spausk mygtuką </h2>
-  <button>Esu picerijoje</button>
+  <div class="container">
+    <h1>🍕 Užeikite į piceriją, kuri yra arčiau pirmosios vietos (akmens)</h1>
+    <h2>Atėjęs į piceriją, spausk mygtuką</h2>
+    <a href="uzduotys.html" class="btn">Esu picerijoje</a>
+  </div>
 </body>
 </html>

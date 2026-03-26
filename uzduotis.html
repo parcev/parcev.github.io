@@ -7,7 +7,7 @@
   <style>
     /* Page background */
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
       display: flex;
@@ -142,6 +142,12 @@
         input.focus();
       }
     }
+    
+    input.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      sprawdzic();
+    }
+  });
   </script>
 </body>
 </html>

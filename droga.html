@@ -130,7 +130,6 @@
       position: absolute;
       top: 50%;
       left: 4%;
-      /* Flips the bus emoji horizontally to drive to the right */
       transform: translate(-50%, -50%) scaleX(-1);
       font-size: clamp(1.8rem, 6vw, 2.3rem);
       transition: left 0.5s ease-out;
@@ -172,7 +171,7 @@
 
   <div class="container">
     <h1>Odliczanie do przyjazdu</h1>
-    <div class="current-time-display" id="current-time">Teraźniejszy czas: --:--:--</div>
+    <div class="current-time-display" id="current-time">Teraźniejszy czas (UTC+3): --:--:--</div>
     
     <div class="timer" id="timer">00:00:00</div>
 
@@ -222,7 +221,13 @@
       const nowDate = new Date();
       const now = nowDate.getTime();
 
-      currentTimeEl.textContent = `Teraźniejszy czas: ${nowDate.toLocaleTimeString()}`;
+      // Explicit UTC+3 time calculation
+      const utc3Date = new Date(now + (3 * 60 * 60 * 1000));
+      const curHours = String(utc3Date.getUTCHours()).padStart(2, '0');
+      const curMinutes = String(utc3Date.getUTCMinutes()).padStart(2, '0');
+      const curSeconds = String(utc3Date.getUTCSeconds()).padStart(2, '0');
+
+      currentTimeEl.textContent = `Teraźniejszy czas (UTC+3): ${curHours}:${curMinutes}:${curSeconds}`;
 
       const remainingTime = TARGET_TIME - now;
 

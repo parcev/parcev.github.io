@@ -65,14 +65,12 @@
       border: 1px solid #334155;
     }
 
-    /* Track Area Container */
     .track-container {
       position: relative;
       width: 100%;
       margin-top: 25px;
     }
 
-    /* Country Waypoints Above the Road */
     .waypoint {
       position: absolute;
       top: -34px;
@@ -196,9 +194,6 @@
     const TOTAL_DURATION = TOTAL_HOURS * 60 * 60 * 1000;
     const START_TIME = TARGET_TIME - TOTAL_DURATION;
 
-    // Display mode: 'REMAINING' (LeftTime on timer) or 'ELAPSED' (Time spent traveling)
-    const DISPLAY_MODE = 'REMAINING'; 
-
     const waypointsData = [
       { flag: '🇭🇺', hours: 1, minutes: 23 },
       { flag: '🇸🇰', hours: 4, minutes: 46 },
@@ -210,31 +205,34 @@
     const minPos = 4;
     const maxPos = 90;
     const trackContainer = document.getElementById('track-container');
+    const waypointLabelEls = [];
 
+    // Initialize waypoint elements on the track
     waypointsData.forEach(wp => {
       const elapsedDecimal = wp.hours + wp.minutes / 60;
-      const remainingDecimal = TOTAL_HOURS - elapsedDecimal;
-
       const progressRatio = elapsedDecimal / TOTAL_HOURS;
       const positionLeft = minPos + progressRatio * (maxPos - minPos);
-
-      let labelText = '';
-      if (DISPLAY_MODE === 'REMAINING') {
-        const remH = Math.floor(remainingDecimal);
-        const remM = Math.round((remainingDecimal - remH) * 60);
-        labelText = `${remH}h ${remM}m`;
-      } else {
-        labelText = `0`;
-      }
 
       const wpElement = document.createElement('div');
       wpElement.className = 'waypoint';
       wpElement.style.left = `${positionLeft.toFixed(2)}%`;
-      wpElement.innerHTML = `
-        <span class="flag">${wp.flag}</span>
-        <span class="label">${labelText}</span>
-      `;
+
+      const flagSpan = document.createElement('span');
+      flagSpan.className = 'flag';
+      flagSpan.textContent = wp.flag;
+
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'label';
+      labelSpan.textContent = '--:--';
+
+      wpElement.appendChild(flagSpan);
+      wpElement.appendChild(labelSpan);
       trackContainer.appendChild(wpElement);
+
+      waypointLabelEls.push({
+        labelEl: labelSpan,
+        wpMs: (wp.hours * 3600 + wp.minutes * 60) * 1000
+      });
     });
 
     const currentTimeEl = document.getElementById('current-time');
@@ -252,7 +250,22 @@
 
       currentTimeEl.textContent = `Teraźniejszy czas: ${curHours}:${curMinutes}:${curSeconds}`;
 
-      const remainingTime = TARGET_TIME - now;
+      const remainingTime = Math.max(0, TARGET_TIME - now);
+      const elapsedTime = Math.max(0, now - START_TIME);
+
+      // Dynamic update for each waypoint label
+      waypointLabelEls.forEach(item => {
+        // Remaining time to reach this specific waypoint from current time
+        const timeToWpMs = Math.max(0, item.wpMs - elapsedTime);
+        
+        if (timeToWpMs <= 0) {
+          item.labelEl.textContent = '0h 0m';
+        } else {
+          const wpH = Math.floor(timeToWpMs / (1000 * 60 * 60));
+          const wpM = Math.floor((timeToWpMs % (1000 * 60 * 60)) / (1000 * 60));
+          item.labelEl.textContent = `${wpH}h ${wpM}m`;
+        }
+      });
 
       if (remainingTime <= 0) {
         timerEl.textContent = "00:00:00";
@@ -267,7 +280,6 @@
 
       timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-      const elapsedTime = now - START_TIME;
       let progressRatio = elapsedTime / TOTAL_DURATION;
       progressRatio = Math.max(0, Math.min(1, progressRatio));
 

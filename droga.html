@@ -89,13 +89,14 @@
     }
 
     .waypoint .label {
-      font-size: clamp(0.65rem, 2.2vw, 0.75rem);
+      font-size: clamp(0.6rem, 2vw, 0.7rem);
       font-weight: 700;
       color: #cbd5e1;
       background: #0f172a;
       padding: 1px 4px;
       border-radius: 4px;
       margin-top: 2px;
+      white-space: nowrap;
     }
 
     .road-wrapper {
@@ -176,8 +177,6 @@
     <div class="timer" id="timer">00:00:00</div>
 
     <div class="track-container" id="track-container">
-      <!-- Waypoints are generated dynamically by JavaScript -->
-
       <div class="road-wrapper">
         <div class="dashed-line"></div>
         <div class="bus" id="bus">🚌</div>
@@ -194,34 +193,46 @@
   <script>
     const TARGET_TIME = new Date('2026-09-07T06:00:00+03:00').getTime();
     const TOTAL_HOURS = 20;
-    const TOTAL_DURATION = TOTAL_HOURS * 60 * 60 * 1000; // 20 hours in ms
+    const TOTAL_DURATION = TOTAL_HOURS * 60 * 60 * 1000;
     const START_TIME = TARGET_TIME - TOTAL_DURATION;
 
-    // Define Waypoints by elapsed time (hours + minutes/60)
+    // Display mode: 'REMAINING' (LeftTime on timer) or 'ELAPSED' (Time spent traveling)
+    const DISPLAY_MODE = 'REMAINING'; 
+
     const waypointsData = [
-      { flag: '🇭🇺', elapsedHours: 1 + 23/60 },
-      { flag: '🇸🇰', elapsedHours: 4 + 46/60 },
-      { flag: '🇨🇿', elapsedHours: 5 + 44/60 },
-      { flag: '🇵🇱', elapsedHours: 9 + 30/60 },
-      { flag: '🇱🇹', elapsedHours: 15 + 43/60 }
+      { flag: '🇭🇺', hours: 1, minutes: 23 },
+      { flag: '🇸🇰', hours: 4, minutes: 46 },
+      { flag: '🇨🇿', hours: 5, minutes: 44 },
+      { flag: '🇵🇱', hours: 9, minutes: 30 },
+      { flag: '🇱🇹', hours: 15, minutes: 43 }
     ];
 
     const minPos = 4;
     const maxPos = 90;
     const trackContainer = document.getElementById('track-container');
 
-    // Dynamically render waypoints with exact track placement and remaining time label
     waypointsData.forEach(wp => {
-      const remainingHours = TOTAL_HOURS - wp.elapsedHours;
-      const progressRatio = wp.elapsedHours / TOTAL_HOURS;
+      const elapsedDecimal = wp.hours + wp.minutes / 60;
+      const remainingDecimal = TOTAL_HOURS - elapsedDecimal;
+
+      const progressRatio = elapsedDecimal / TOTAL_HOURS;
       const positionLeft = minPos + progressRatio * (maxPos - minPos);
+
+      let labelText = '';
+      if (DISPLAY_MODE === 'REMAINING') {
+        const remH = Math.floor(remainingDecimal);
+        const remM = Math.round((remainingDecimal - remH) * 60);
+        labelText = `${remH}h ${remM}m`;
+      } else {
+        labelText = `${wp.hours}h ${wp.minutes}m`;
+      }
 
       const wpElement = document.createElement('div');
       wpElement.className = 'waypoint';
       wpElement.style.left = `${positionLeft.toFixed(2)}%`;
       wpElement.innerHTML = `
         <span class="flag">${wp.flag}</span>
-        <span class="label">${Math.round(remainingHours)}h</span>
+        <span class="label">${labelText}</span>
       `;
       trackContainer.appendChild(wpElement);
     });

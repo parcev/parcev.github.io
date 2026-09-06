@@ -171,31 +171,12 @@
 
   <div class="container">
     <h1>Odliczanie do przyjazdu</h1>
-    <div class="current-time-display" id="current-time" hidden>Teraźniejszy czas (UTC+3): --:--:--</div>
+    <div class="current-time-display" id="current-time" hidden>Teraźniejszy czas: --:--:--</div>
     
     <div class="timer" id="timer">00:00:00</div>
 
-    <div class="track-container">
-      <div class="waypoint" style="left: 9.95%;">
-        <span class="flag">🇭🇺</span>
-        <span class="label">3h</span>
-      </div>
-      <div class="waypoint" style="left: 24.5%;">
-        <span class="flag">🇸🇰</span>
-        <span class="label">12h</span>
-      </div>
-      <div class="waypoint" style="left: 28.65%;">
-        <span class="flag">🇨🇿</span>
-        <span class="label">14h</span>
-      </div>
-      <div class="waypoint" style="left: 44.85%;">
-        <span class="flag">🇵🇱</span>
-        <span class="label">19h</span>
-      </div>
-      <div class="waypoint" style="left: 71.58%;">
-        <span class="flag">🇵🇱</span>
-        <span class="label">19h</span>
-      </div>
+    <div class="track-container" id="track-container">
+      <!-- Waypoints are generated dynamically by JavaScript -->
 
       <div class="road-wrapper">
         <div class="dashed-line"></div>
@@ -211,21 +192,48 @@
   </div>
 
   <script>
-    // Target date: September 1, 2026, 12:00:00 UTC+2
-    const TARGET_TIME = new Date('2026-09-07T06:00:00+03:00').getTime();
-    const TOTAL_DURATION = 20 * 60 * 60 * 1000; // 20 hours in milliseconds
+    const TARGET_TIME = new Date('2026-09-01T13:00:00+03:00').getTime();
+    const TOTAL_HOURS = 20;
+    const TOTAL_DURATION = TOTAL_HOURS * 60 * 60 * 1000; // 20 hours in ms
     const START_TIME = TARGET_TIME - TOTAL_DURATION;
-    
+
+    // Define Waypoints by elapsed time (hours + minutes/60)
+    const waypointsData = [
+      { flag: '🇭🇺', elapsedHours: 1 + 23/60 },
+      { flag: '🇸🇰', elapsedHours: 4 + 46/60 },
+      { flag: '🇨🇿', elapsedHours: 5 + 44/60 },
+      { flag: '🇵🇱', elapsedHours: 9 + 30/60 },
+      { flag: '🇱🇹', elapsedHours: 15 + 43/60 }
+    ];
+
+    const minPos = 4;
+    const maxPos = 90;
+    const trackContainer = document.getElementById('track-container');
+
+    // Dynamically render waypoints with exact track placement and remaining time label
+    waypointsData.forEach(wp => {
+      const remainingHours = TOTAL_HOURS - wp.elapsedHours;
+      const progressRatio = wp.elapsedHours / TOTAL_HOURS;
+      const positionLeft = minPos + progressRatio * (maxPos - minPos);
+
+      const wpElement = document.createElement('div');
+      wpElement.className = 'waypoint';
+      wpElement.style.left = `${positionLeft.toFixed(2)}%`;
+      wpElement.innerHTML = `
+        <span class="flag">${wp.flag}</span>
+        <span class="label">${Math.round(remainingHours)}h</span>
+      `;
+      trackContainer.appendChild(wpElement);
+    });
+
     const currentTimeEl = document.getElementById('current-time');
     const timerEl = document.getElementById('timer');
     const busEl = document.getElementById('bus');
     const progressPercentEl = document.getElementById('progress-percent');
 
     function updateTimer() {
-      const nowDate = new Date();
-      const now = nowDate.getTime();
+      const now = new Date().getTime();
 
-      // Explicit UTC+3 time calculation
       const utc3Date = new Date(now + (3 * 60 * 60 * 1000));
       const curHours = String(utc3Date.getUTCHours()).padStart(2, '0');
       const curMinutes = String(utc3Date.getUTCMinutes()).padStart(2, '0');
@@ -246,19 +254,12 @@
       const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
-      const hh = String(hours).padStart(2, '0');
-      const mm = String(minutes).padStart(2, '0');
-      const ss = String(seconds).padStart(2, '0');
-
-      timerEl.textContent = `${hh}:${mm}:${ss}`;
+      timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
       const elapsedTime = now - START_TIME;
       let progressRatio = elapsedTime / TOTAL_DURATION;
       progressRatio = Math.max(0, Math.min(1, progressRatio));
 
-      // Map progress ratio to bus visual track boundaries (4% to 90%)
-      const minPos = 4;
-      const maxPos = 90;
       const currentPos = minPos + progressRatio * (maxPos - minPos);
 
       busEl.style.left = `${currentPos}%`;

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Darmowy Cukierek!</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; }
+    .card { background: white; padding: 25px; border-radius: 12px; max-width: 400px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    button { width: 100%; padding: 15px; margin: 10px 0; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .btn-fb { background: #1877F2; color: white; }
+    .btn-candy { background: #28a745; color: white; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>🍬 Odbierz darmowego cukierka!</h2>
+  <p>1. Zaobserwuj nasz profil, a następnie wróć tutaj i odbierz nagrodę.</p>
+  
+  <button class="btn-fb" onclick="openProfile()">1. Zaobserwuj profil na Facebooku</button>
+  <button id="candyBtn" class="btn-candy" onclick="dispenseCandy()" disabled>2. Odbierz cukierka</button>
+  
+  <p id="status" style="margin-top: 15px; font-weight: bold;"></p>
+</div>
+
+<script>
+  let hasVisitedProfile = false;
+
+  // Sprawdź, czy użytkownik już brał cukierka dzisiaj
+  if (localStorage.getItem("candy_claimed")) {
+    document.getElementById("status").innerText = "❌ Już odebrałeś dzisiaj cukierka!";
+    document.getElementById("candyBtn").disabled = true;
+  }
+
+  function openProfile() {
+    // Otwórz profil FB w nowej karcie
+    window.open("https://www.facebook.com/TwojProfil", "_blank");
+    hasVisitedProfile = true;
+    
+    // Odczekaj 5 sekund, zanim odblokujesz przycisk
+    document.getElementById("status").innerText = "Czekam na potwierdzenie...";
+    setTimeout(() => {
+      if (!localStorage.getItem("candy_claimed")) {
+        document.getElementById("candyBtn").disabled = false;
+        document.getElementById("status").innerText = "Gotowe! Kliknij zielony przycisk.";
+      }
+    }, 5000);
+  }
+
+  async function dispenseCandy() {
+    document.getElementById("candyBtn").disabled = true;
+    document.getElementById("status").innerText = "Wysyłanie sygnału do automatu...";
+
+    try {
+      // Wywołanie darmowego API Adafruit IO / MQTT / Webhook
+      await fetch("HTTPS://IO.ADAFRUIT.COM/API/V2/TWOJ_USER/FEEDS/CUKIERKI/DATA", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-AIO-Key": "TWOJ_KLUCZ_ADAFRUIT_API"
+        },
+        body: JSON.stringify({ value: "1" })
+      });
+
+      // Zapisz blokadę w telefonie
+      localStorage.setItem("candy_claimed", "true");
+      document.getElementById("status").innerText = "🎉 Smacznego! Zabierz cukierek z podajnika.";
+    } catch (err) {
+      document.getElementById("status").innerText = "⚠️ Błąd połączenia z automatem!";
+      document.getElementById("candyBtn").disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>

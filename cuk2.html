@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odbierz darmowego cukierka!</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      background: #f0f2f5; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 20px; 
+    }
+    .card { 
+      background: white; 
+      padding: 30px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+      width: 100%; 
+      max-width: 420px; 
+      text-align: center; 
+    }
+    .icon { font-size: 48px; margin-bottom: 12px; }
+    h1 { font-size: 22px; color: #1c1e21; margin-bottom: 8px; }
+    p { font-size: 14px; color: #606770; margin-bottom: 20px; line-height: 1.4; }
+    
+    button { 
+      width: 100%; 
+      padding: 16px; 
+      font-size: 16px; 
+      font-weight: bold; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      transition: background 0.2s, transform 0.1s; 
+      margin-bottom: 12px; 
+    }
+    button:active { transform: scale(0.98); }
+    
+    .btn-fb { background: #1877f2; color: white; }
+    .btn-fb:hover { background: #166fe5; }
+    
+    .btn-candy { background: #28a745; color: white; }
+    .btn-candy:hover { background: #218838; }
+    
+    button:disabled { 
+      background: #e4e6eb; 
+      color: #bcc0c4; 
+      cursor: not-allowed; 
+      transform: none; 
+    }
+    
+    .status { 
+      font-weight: 600; 
+      font-size: 14px; 
+      margin-top: 10px; 
+      padding: 12px; 
+      border-radius: 8px; 
+      background: #f7f8fa; 
+      color: #333; 
+      min-height: 50px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      line-height: 1.3;
+    }
+    .status.error { background: #ffebe9; color: #c0392b; }
+    .status.success { background: #e6f4ea; color: #137333; }
+  </style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+  <div class="icon">🍬</div>
+  <h1>Darmowy Cukierek!</h1>
+  <p>Zaobserwuj nasz profil na Facebooku i odbierz słodką nagrodę z automatu.</p>
+
+  <button class="btn-fb" onclick="openFacebookProfile()">1. Zaobserwuj profil na FB</button>
+  <button id="candyBtn" class="btn-candy" onclick="claimCandy()" disabled>2. Odbierz cukierka</button>
+
+  <div class="status" id="statusBox">Inicjalizacja połączenia...</div>
+</div>
+
+<script>
+  // =========================================================================
+  // KONFIGURACJA - ZMIENIAJ TYLKO TE DWA ADRESY:
+  // =========================================================================
+  const BACKEND_URL = "https://twoj-serwer.onrender.com";  // Twój serwer Python
+  const FB_PROFILE_URL = "https://www.facebook.com/TwojProfil"; // Link do profilu FB
+  // =========================================================================
+
+  let sessionId = null;
+
+  // 1. Wykrywanie trybu prywatnego / Inkognito
+  async function isIncognito() {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const { quota } = await navigator.storage.estimate();
+      return quota < 120000000; // Poniżej ~120MB to zazwyczaj tryb prywatny
+    }
+    return false;
+  }
+
+  // 2. Tworzenie tymczasowej sesji po wejściu na stronę
+  async function initSession() {
+    const statusBox = document.getElementById("statusBox");
+
+    // Sprawdź czy użytkownik już odebrał cukierka na tym urządzeniu
+    if (localStorage.getItem("candy_claimed")) {
+      statusBox.innerText = "❌ Już odebrałeś dzisiaj cukierka. Dziękujemy!";
+      statusBox.classList.add("error");
+      return;
+    }
+
+    // Blokada trybu Inkognito
+    if (await isIncognito()) {
+      document.getElementById("mainCard").innerHTML = `
+        <div class="icon">⚠️</div>
+        <h1>Tryb Inkognito</h1>
+        <p>Aplikacja nie działa w trybie prywatnym. Otwórz stronę w zwykłej przeglądarce, aby móc odebrać cukierka.</p>
+      `;
+      return;
+    }
+
+    statusBox.innerText = "Łączenie z automatem...";
+
+    try {
+      // Zapytanie o utworzenie nowej tymczasowej sesji (Session Baseline)
+      const response = await fetch(`${BACKEND_URL}/start-session`, {
+        method: "POST"
+      });
+      
+      if (!response.ok) throw new Error("Błąd podczas nawiązywania sesji");
+      
+      const data = await response.json();
+      sessionId = data.session_id;
+
+      statusBox.innerText = "Kliknij przycisk #1, aby zaobserwować profil.";
+    } catch (err) {
+      console.error(err);
+      statusBox.innerText = "⚠️ Błąd połączenia z serwerem. Odśwież stronę.";
+      statusBox.classList.add("error");
+    }
+  }
+
+  // 3. Przejście na profil Facebooka
+  function openFacebookProfile() {
+    if (!sessionId) {
+      alert("Sesja nie została jeszcze załadowana. Odśwież stronę.");
+      return;
+    }
+
+    // Otwórz Facebooka w nowej karcie
+    window.open(FB_PROFILE_URL, "_blank");
+
+    const statusBox = document.getElementById("statusBox");
+    statusBox.classList.remove("error", "success");
+    statusBox.innerText = "Po zaobserwowaniu profilu wróć tutaj i kliknij przycisk #2.";
+
+    // Odblokuj przycisk odbioru po 3 sekundach
+    setTimeout(() => {
+      document.getElementById("candyBtn").disabled = false;
+    }, 3000);
+  }
+
+  // 4. Weryfikacja polubienia i wysłanie sygnału do wydania cukierka
+  async function claimCandy() {
+    const candyBtn = document.getElementById("candyBtn");
+    const statusBox = document.getElementById("statusBox");
+
+    candyBtn.disabled = true;
+    statusBox.classList.remove("error", "success");
+    statusBox.innerText = "Sprawdzanie w Facebook Graph API...";
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/verify-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        statusBox.innerText = "🎉 " + data.message;
+        statusBox.classList.add("success");
+        
+        // Zapisz lokalną blokadę w przeglądarce
+        localStorage.setItem("candy_claimed", "true");
+      } else {
+        statusBox.innerText = "⚠️ " + data.message;
+        statusBox.classList.add("error");
+        
+        // Odblokuj przycisk do ponownej próby po 10 sekundach
+        setTimeout(() => {
+          candyBtn.disabled = false;
+        }, 10000);
+      }
+    } catch (err) {
+      console.error(err);
+      statusBox.innerText = "⚠️ Błąd połączenia z serwerem. Spróbuj ponownie.";
+      statusBox.classList.add("error");
+      candyBtn.disabled = false;
+    }
+  }
+
+  // Uruchomienie przy załadowaniu strony
+  window.onload = initSession;
+</script>
+
+</body>
+</html>

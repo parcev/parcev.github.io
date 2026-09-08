@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jednorazowy Przycisk</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Wygląd zablokowanego przycisku */
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="myButton">Kliknij mnie (tylko raz!)</button>
+    <p id="message"></p>
+
+    <script>
+        // Pobieramy elementy z DOM
+        const btn = document.getElementById('myButton');
+        const message = document.getElementById('message');
+
+        // Klucz, pod którym będziemy zapisywać stan w localStorage
+        const STORAGE_KEY = 'hasClickedButton';
+
+        // Funkcja sprawdzająca status przycisku po załadowaniu strony
+        function checkStatus() {
+            const hasClicked = localStorage.getItem(STORAGE_KEY);
+
+            if (hasClicked) {
+                // Jeśli użytkownik już kliknął:
+                disableButton();
+                message.textContent = "Już kliknąłeś ten przycisk! Nie możesz zrobić tego ponownie.";
+            }
+        }
+
+        // Funkcja do blokowania przycisku
+        function disableButton() {
+            btn.disabled = true;
+            btn.textContent = "Przycisk zablokowany";
+        }
+
+        // Obsługa kliknięcia przycisku
+        btn.addEventListener('click', function() {
+            // 1. Zapisujemy w localStorage, że użytkownik kliknął
+            localStorage.setItem(STORAGE_KEY, 'true');
+
+            // 2. Blokujemy przycisk
+            disableButton();
+            
+            // 3. Wyświetlamy komunikat
+            message.textContent = "Dziękujemy! Twoje kliknięcie zostało zapisane.";
+        });
+
+        // Wywołujemy sprawdzanie od razu przy wejściu na stronę
+        checkStatus();
+    </script>
+
+</body>
+</html>
